@@ -10,25 +10,23 @@ namespace QueryIt
     public class EmployeeDb : DbContext
     {
         public DbSet<Employee> Employees { get; set; }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(
-        //        @"Server=PF0S793ASUNKUM\\MSSQLSERVER17;Database=PeopleDB;User Id=sa;Password=Admin123;
-        //        Trusted_Connection=True;MultipleActiveResultSets=true;");
-        //}
     }
-    // Covariants - out T
+    // Covariance - out T
     public interface IReadonlyRepository<out T> : IDisposable
     {
         T FindById(int id);
         IQueryable<T> FindAll();
-        int Commit();
     }
-    public interface IRepository<T> : IReadonlyRepository<T>, IDisposable
+    // Contravariance - in T
+    public interface IWriteOnlyRepository<in T> : IDisposable
     {
         void Add(T newEntity);
         void Delete(T entity);
+        int Commit();
+    }
+    public interface IRepository<T> : IReadonlyRepository<T>, IWriteOnlyRepository<T>, IDisposable
+    {
+
     }
 
     public class SqlRepository<T> : IRepository<T> where T : class, IEntity

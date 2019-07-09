@@ -15,11 +15,18 @@ namespace QueryIt
             {
 
                 AddEmployees(employeeRepository);
+                AddManagers(employeeRepository);
                 CountEmployees(employeeRepository);
                 QueryEmployees(employeeRepository);
                 DumpPeople(employeeRepository);
             }
 
+        }
+
+        private static void AddManagers(IWriteOnlyRepository<Manager> employeeRepository)
+        {
+            employeeRepository.Add(new Manager { Name = "Mgr. Scott" });
+            employeeRepository.Commit();
         }
 
         private static void DumpPeople(IReadonlyRepository<Person> employeeRepository)
