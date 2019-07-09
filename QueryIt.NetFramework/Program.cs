@@ -20,7 +20,6 @@ namespace QueryIt
                 QueryEmployees(employeeRepository);
                 DumpPeople(employeeRepository);
             }
-
         }
 
         private static void AddManagers(IWriteOnlyRepository<Manager> employeeRepository)
