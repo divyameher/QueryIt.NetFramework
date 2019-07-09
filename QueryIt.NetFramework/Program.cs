@@ -10,18 +10,31 @@ namespace QueryIt
     {
         static void Main(string[] args)
         {
-            //var repository = new Repository<Employee>(); // talks to real database!
-            //AddEmployee(repository);
-            //AddManager(repository);
-            //CountEmployees(repository);
-            //PrintAllPeople(repository);
             Database.SetInitializer(new DropCreateDatabaseAlways<EmployeeDb>());
             using (IRepository<Employee> employeeRepository = new SqlRepository<Employee>(new EmployeeDb()))
             {
 
                 AddEmployees(employeeRepository);
                 CountEmployees(employeeRepository);
+                QueryEmployees(employeeRepository);
+                DumpPeople(employeeRepository);
             }
+
+        }
+
+        private static void DumpPeople(IReadonlyRepository<Person> employeeRepository)
+        {
+            var persons = employeeRepository.FindAll();
+            foreach (var person in persons)
+            {
+                Console.WriteLine($"People are : {person.Name}");
+            }
+        }
+
+        private static void QueryEmployees(IRepository<Employee> employeeRepository)
+        {
+            var employee = employeeRepository.FindById(1);
+            Console.WriteLine($"Queried Employee is : {employee.Name}");
 
         }
 

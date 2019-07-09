@@ -18,16 +18,20 @@ namespace QueryIt
         //        Trusted_Connection=True;MultipleActiveResultSets=true;");
         //}
     }
-    public interface IRepository<T> : IDisposable
+    // Covariants - out T
+    public interface IReadonlyRepository<out T> : IDisposable
     {
-        void Add(T newEntity);
-        void Delete(T entity);
         T FindById(int id);
         IQueryable<T> FindAll();
         int Commit();
     }
+    public interface IRepository<T> : IReadonlyRepository<T>, IDisposable
+    {
+        void Add(T newEntity);
+        void Delete(T entity);
+    }
 
-    public class SqlRepository<T> : IRepository<T> where T : class
+    public class SqlRepository<T> : IRepository<T> where T : class, IEntity
     {
         DbContext _context;
         DbSet<T> _set;
@@ -39,7 +43,10 @@ namespace QueryIt
 
         public void Add(T newEntity)
         {
-            _set.Add(newEntity);
+            if (newEntity.IsValid())
+            {
+                _set.Add(newEntity);
+            }
         }
 
         public int Commit()
@@ -49,7 +56,7 @@ namespace QueryIt
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            _set.Remove(entity);
         }
 
         public void Dispose()
@@ -64,7 +71,7 @@ namespace QueryIt
 
         public T FindById(int id)
         {
-            throw new NotImplementedException();
+            return _set.Find(id);
         }
     }
 }
