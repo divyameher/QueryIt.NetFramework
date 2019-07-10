@@ -28,6 +28,16 @@ namespace ReflectIt
                 var destinationType = _map[sourceType];
                 return CreateInstance(destinationType);
             }
+            else if (sourceType.IsGenericType && _map.ContainsKey(sourceType.GetGenericTypeDefinition()))
+            {
+                var destinationType = _map[sourceType.GetGenericTypeDefinition()];
+                var closedDefinition = destinationType.MakeGenericType(sourceType.GenericTypeArguments);
+                return CreateInstance(closedDefinition);
+            }
+            else if (!sourceType.IsAbstract)
+            {
+                return CreateInstance(sourceType);
+            }
             else
             {
                 throw new InvalidOperationException("Couldn't resolve " + sourceType.FullName);
