@@ -8,17 +8,49 @@ namespace ReflectIt
 {
     public class Container
     {
-        public Container For<T>()
+        Dictionary<Type, Type> _map = new Dictionary<Type, Type>();
+        public ContainerBuilder For<TSource>()
         {
-            return this;
+            return For(typeof(TSource));
         }
-        public Container Use<T>()
+        public ContainerBuilder For(Type sourceType)
         {
-            return this;
+            return new ContainerBuilder(this, sourceType);
         }
-        public Container Resolve<T>()
+        public TSource Resolve<TSource>()
         {
-            return this;
+            return (TSource)Resolve(typeof(TSource));
+        }
+        public object Resolve(Type sourceType)
+        {
+            if (_map.ContainsKey(sourceType))
+            {
+                var destinationType = _map[sourceType];
+                return Activator.CreateInstance(destinationType);
+            }
+            else
+            {
+                throw new InvalidOperationException("Couldn't resolve " + sourceType.FullName);
+            }
+        }
+        public class ContainerBuilder
+        {
+            private Container _container;
+            private Type _sourceType;
+            public ContainerBuilder(Container container, Type sourceType)
+            {
+                _container = container;
+                _sourceType = sourceType;
+            }
+            public ContainerBuilder Use<TDestination>()
+            {
+                return Use(typeof(TDestination));
+            }
+            public ContainerBuilder Use(Type destinationType)
+            {
+                _container._map.Add(_sourceType, destinationType);
+                return this;
+            }
         }
     }
 }
